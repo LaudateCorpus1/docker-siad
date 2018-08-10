@@ -1,13 +1,15 @@
-FROM golang:1.8
+FROM alpine:latest
 
-RUN go get -u -v github.com/NebulousLabs/Sia/...
+RUN apk add --update wget zip && \
+    wget https://github.com/NebulousLabs/Sia/releases/download/v1.3.3/Sia-v1.3.3-linux-amd64.zip && \
+    unzip Sia-v1.3.3-linux-amd64.zip
 
 FROM node:8.1-slim
 
 WORKDIR /usr/src/app
 
-COPY --from=0 /go/bin/siad /usr/bin/siad
-COPY --from=0 /go/bin/siac /usr/bin/siac
+COPY --from=0 /Sia-v1.3.3-linux-amd64/siad /usr/bin/siad
+COPY --from=0 /Sia-v1.3.3-linux-amd64/siac /usr/bin/siac
 
 RUN mkdir -p /usr/src/app /siad/data
 COPY ["node-proxy/package.json", "node-proxy/package-lock.json", "/usr/src/app/"]
